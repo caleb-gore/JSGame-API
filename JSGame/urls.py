@@ -17,13 +17,14 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 from rest_framework import routers
-from JSGame_api.views import register_user, login_user, GameView, AssetView
+from JSGame_api.views import register_user, login_user, GameView, AssetView, UserView
 from django.conf.urls.static import static
 from django.conf import settings
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'games', GameView, 'game')
 router.register(r'assets', AssetView, 'asset')
+router.register(r'users', UserView, 'user')
 
 urlpatterns = [
     path('register', register_user),
