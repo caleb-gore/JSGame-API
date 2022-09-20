@@ -12,13 +12,14 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = (
             'id',
-            'score',
-            'level',
-            'date_created',
-            'last_saved',
-            'user',
-            'lives',
-            'game_over'
+            'name',
+            'access_code',
+            'background_asset',
+            'character_asset',
+            'creator',
+            'enemy_asset',
+            'trophy_asset',
+            'other_asset',
         )
 
 class GameView(ViewSet):
@@ -31,13 +32,16 @@ class GameView(ViewSet):
             Response -- JSON serialized game instance
         """
         
-        
         game = Game.objects.create(
-            score = request.data["score"],
-            level = request.data["level"],
-            lives = request.data["lives"],
-            user = request.auth.user,
-            game_over = request.data["game_over"]
+            name = request.data["name"],
+            creator = request.auth.user,
+            access_code = request.data["access_code"],
+            background_asset = request.data["background_asset"],
+            character_asset = request.data['character_asset'],
+            collectable_asset = request.data["collectable_asset"],
+            enemy_asset = request.data["enemy_asset"],
+            trophy_asset = request.data["trophy_asset"],
+            other_asset = request.data["other_asset"]
         )
         
         serializer = GameSerializer(game)
@@ -49,10 +53,21 @@ class GameView(ViewSet):
             Response -- JSON serialized list of games
         """
         games = Game.objects.all()
-        games = games.filter(user=request.auth.user)
-
+        
         serializer = GameSerializer(games, many=True)
         return Response(serializer.data)
+    
+    def retrieve(self, request, pk):
+        """Handle GET requests for single game
+        Returns:
+            Response -- JSON serialized game
+        """
+        try:
+            game = Game.objects.get(pk=pk)
+            serializer = GameSerializer(game)
+            return Response(serializer.data)
+        except Game.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
     
     def destroy(self, request, pk):
         """Handle DELETE request for a game

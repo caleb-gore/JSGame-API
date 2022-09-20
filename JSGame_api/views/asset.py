@@ -42,6 +42,19 @@ class AssetView(ViewSet):
         serializer = AssetSerializer(assets, many=True)
         return Response(serializer.data)
     
+    def retrieve(self, request, pk):
+        """Handle GET requests for single user
+        Returns:
+            Response -- JSON serialized user
+        """
+        try:
+            asset = Asset.objects.get(pk=pk)
+            serializer = AssetSerializer(asset)
+            return Response(serializer.data)
+        except Asset.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
+    
     def destroy(self, request, pk):
         """Handle DELETE request for a asset
         Returns:
