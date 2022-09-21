@@ -2,8 +2,9 @@
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import serializers, status
-from JSGame_api.models import Save
+from JSGame_api.models import Save, Trophy
 
 class SaveSerializer(serializers.ModelSerializer):
     """ JSON serializer for games """
@@ -16,9 +17,10 @@ class SaveSerializer(serializers.ModelSerializer):
             'level',
             'date_created',
             'last_saved',
-            'user',
+            'player',
             'lives',
-            'game_over'
+            'game_over',
+            'awarded_trophies'
         )
 
 class SaveView(ViewSet):
@@ -39,6 +41,18 @@ class SaveView(ViewSet):
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
     
+    def retrieve(self, request, pk):
+        """Handle GET requests for single game
+        Returns:
+            Response -- JSON serialized game
+        """
+        try:
+            save = Save.objects.get(pk=pk)
+            serializer = SaveSerializer(save)
+            return Response(serializer.data)
+        except Save.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+    
     def create(self, request):
         """ Handle POST operations 
         
@@ -51,7 +65,7 @@ class SaveView(ViewSet):
             score = request.data["score"],
             level = request.data["level"],
             lives = request.data["lives"],
-            user = request.auth.user,
+            player = request.auth.user,
             game_over = request.data["game_over"]
         )
         
@@ -64,7 +78,7 @@ class SaveView(ViewSet):
             Response -- JSON serialized list of games
         """
         saves = Save.objects.all()
-        saves = saves.filter(user=request.auth.user)
+        saves = saves.filter(player=request.auth.user)
 
         serializer = SaveSerializer(saves, many=True)
         return Response(serializer.data)
@@ -77,3 +91,12 @@ class SaveView(ViewSet):
         save = Save.objects.get(pk=pk)
         save.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+    
+    @action(methods=['post'], detail=True)
+    def award_trophy(self, request, pk):
+        """Handle POST requests for awarded trophies"""
+        
+        save = Save.objects.get(pk=pk)
+        trophy = Trophy.objects.get(pk=request.data["trophy_id"])
+        save.awarded_trophies.add(trophy)
+        return Response({'message': 'trophy saved'}, status=status.HTTP_201_CREATED)

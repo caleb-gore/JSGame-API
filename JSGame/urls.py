@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 from rest_framework import routers
-from JSGame_api.views import register_user, login_user, SaveView, AssetView, UserView, GameView
+from JSGame_api.views import register_user, login_user, SaveView, AssetView, UserView, GameView, TrophyView
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -26,6 +26,7 @@ router.register(r'saves', SaveView, 'save')
 router.register(r'assets', AssetView, 'asset')
 router.register(r'users', UserView, 'user')
 router.register(r'games', GameView, 'game')
+router.register(r'trophies', TrophyView, 'trophy')
 
 urlpatterns = [
     path('register', register_user),
