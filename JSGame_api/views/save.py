@@ -22,6 +22,7 @@ class SaveSerializer(serializers.ModelSerializer):
             'game_over',
             'awarded_trophies'
         )
+        depth = 1
 
 class SaveView(ViewSet):
     """ JSGame games view """
