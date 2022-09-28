@@ -25,6 +25,7 @@ class AssetView(ViewSet):
             name = request.data['name'],
             width = request.data['width'],
             height = request.data['height'],
+            frames = request.data['frames'],
             type = request.data['type'],
             file = data
         )
@@ -64,6 +65,31 @@ class AssetView(ViewSet):
         asset.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
     
+    def update(self, request, pk):
+        """Handle PUT requests for a game
+        Returns:
+            Response -- Empty body with 204 status code
+        """
+        
+        asset = Asset.objects.get(pk=pk)
+        try:
+            format, imgstr = request.data['file'].split(';base64,')
+            ext = format.split('/')[-1]
+            data = ContentFile(base64.b64decode(imgstr), name=f'{request.data["name"]}-{uuid.uuid4()}.{ext}')
+            asset.file = data
+        except:
+            pass
+
+        asset = Asset.objects.get(pk=pk)
+        asset.name = request.data['name']
+        asset.width = request.data['width']
+        asset.height = request.data['height']
+        asset.frames = request.data['frames']
+        asset.type = request.data['type']
+        asset.save()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+    
 class AssetSerializer(serializers.ModelSerializer):
     """JSON serializer for assets"""
     
@@ -74,6 +100,7 @@ class AssetSerializer(serializers.ModelSerializer):
             "name",
             "width",
             "height",
+            "frames",
             "file",
             "type"
         )

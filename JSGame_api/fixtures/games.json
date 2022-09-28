@@ -1,0 +1,13 @@
+[
+    {
+        "model": "JSGame_api.game",
+        "pk": 1,
+        "fields": {
+            "name": "Dragon Game",
+            "creator": 1,
+            "character_asset": 18,
+            "enemy_asset": 19,
+            "background_asset": 20
+        }
+    }
+]

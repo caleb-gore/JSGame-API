@@ -15,6 +15,7 @@ class TrophySerializer(serializers.ModelSerializer):
             'type',
             'asset'
         )
+        depth = 2
 
 class TrophyView(ViewSet):
     """ JSGame trophies view """

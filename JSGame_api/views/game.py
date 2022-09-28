@@ -77,3 +77,23 @@ class GameView(ViewSet):
         game = Game.objects.get(pk=pk)
         game.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+    
+    def update(self, request, pk):
+        """Handle PUT requests for a game
+        Returns:
+            Response -- Empty body with 204 status code
+        """
+
+        game = Game.objects.get(pk=pk)
+        game.name = request.data["name"]
+        game.creator = request.auth.user
+        game.character_asset = request.data["character_asset"]
+        game.background_asset = request.data["background_asset"]
+        game.enemy_asset = request.data["enemy_asset"]
+        game.trophy_asset = request.data["trophy_asset"]
+        game.other_asset = request.data["other_asset"]
+        game.collectable_asset = request.data["collectable_asset"]
+        game.access_code = request.data["access_code"]
+        game.save()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
